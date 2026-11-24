@@ -10,8 +10,9 @@ CREATE TABLE users (
     role role_enum NOT NULL DEFAULT 'user',
     major VARCHAR(100),
     year_of_study INT,
-    
-    -- 5 DigComp Scores
+    avatar_url TEXT,
+
+    -- 5 DigComp
     score_info_data INT NOT NULL DEFAULT 0,
     score_com_collab INT NOT NULL DEFAULT 0,
     score_content_creation INT NOT NULL DEFAULT 0,
@@ -43,6 +44,7 @@ CREATE TABLE posts (
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     content TEXT NOT NULL,
+    image_url TEXT,
     video_url VARCHAR(255), 
     author_id UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -59,6 +61,7 @@ CREATE TABLE series (
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
+    image_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -98,6 +101,7 @@ CREATE TABLE courses (
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
+    image_url TEXT,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -125,10 +129,12 @@ CREATE TABLE skill_tree_nodes (
     skill_tree_id UUID NOT NULL REFERENCES skill_trees(id) ON DELETE CASCADE,
     skill_id UUID NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
     parent_node_id UUID REFERENCES skill_tree_nodes(id) ON DELETE CASCADE,
-    
+    position_x DOUBLE PRECISION NOT NULL DEFAULT 0,
+    position_y DOUBLE PRECISION NOT NULL DEFAULT 0,
     target_course_id UUID REFERENCES courses(id) ON DELETE SET NULL,
     target_series_id UUID REFERENCES series(id) ON DELETE SET NULL,
-    target_post_id UUID REFERENCES posts(id) ON DELETE SET NULL
+    target_post_id UUID REFERENCES posts(id) ON DELETE SET NULL,
+    UNIQUE (skill_tree_id, position_x, position_y)
 );
 
 -- UI CARDS... BASICALLY ADS, NO IDEA IF I WILL USE, BUT MADE JUST IN CASE :3

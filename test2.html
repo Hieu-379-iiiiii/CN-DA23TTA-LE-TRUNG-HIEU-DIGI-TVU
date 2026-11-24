@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCore — Student Competence Portal</title>
+    <!-- Load Tailwind CSS for layout utilities -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Flat Design Styling - Strictly NO gradients anywhere */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Flat Elevated Panels with Crisp Borders */
+        .flat-panel {
+            background-color: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 2px 0 0 #e2e8f0;
+        }
+
+        /* User-Provided Skill Pentagon Styles (Preserved & Scoped cleanly) */
+        .skill-pentagon-container {
+            width: 100%;
+            max-width: 460px;
+            aspect-ratio: 1;
+            margin: auto;
+        }
+
+        .pentagon-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .skill-sector {
+            cursor: pointer;
+            transform-origin: 250px 250px;
+            transition:
+                transform 0.3s ease,
+                filter 0.3s ease;
+        }
+
+        .sector-polygon {
+            fill-opacity: 1;
+            stroke-width: 2.5;
+            stroke-linejoin: round;
+            transition: fill-opacity 0.2s ease;
+        }
+
+        .skill-sector:hover .sector-polygon,
+        .skill-sector.active-sector .sector-polygon {
+            fill-opacity: 1;
+        }
+
+        /* Sector animations */
+        #sector-1:hover,
+        #sector-1.active-sector {
+            transform: translate(12px, -18px);
+            filter: drop-shadow(0 15px 25px rgba(59, 130, 246, 0.75));
+        }
+
+        #sector-2:hover,
+        #sector-2.active-sector {
+            transform: translate(18px, 18px);
+            filter: drop-shadow(0 15px 25px rgba(247, 171, 85, 0.75));
+        }
+
+        #sector-3:hover,
+        #sector-3.active-sector {
+            transform: translate(0px, 20px);
+            filter: drop-shadow(0 15px 25px rgba(16, 185, 129, 0.75));
+        }
+
+        #sector-4:hover,
+        #sector-4.active-sector {
+            transform: translate(-18px, 18px);
+            filter: drop-shadow(0 15px 25px rgba(245, 158, 11, 0.75));
+        }
+
+        #sector-5:hover,
+        #sector-5.active-sector {
+            transform: translate(-12px, -18px);
+            filter: drop-shadow(0 15px 25px rgba(244, 63, 94, 0.75));
+        }
+
+        .sector-label {
+            pointer-events: none;
+            user-select: none;
+        }
+
+        #sector-1 .sector-polygon { fill: #3b82f6; stroke: #93c5fd; }
+        #sector-2 .sector-polygon { fill: #f59e0b; stroke: #fcd34d; }
+        #sector-3 .sector-polygon { fill: #10b981; stroke: #6ee7b7; }
+        #sector-4 .sector-polygon { fill: #eab308; stroke: #fde047; }
+        #sector-5 .sector-polygon { fill: #f43f5e; stroke: #fda4af; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                
+                <!-- Left: Brand Logo & Nav Links -->
+                <div class="flex items-center gap-8">
+                    <!-- Brand Mark -->
+                    <a href="#" class="flex items-center gap-2.5 group">
+                        <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center">
+                            <!-- Flat Geometric Pentagon Emblem -->
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="12,2 22,9.2 18.2,21 5.8,21 2,9.2" />
+                            </svg>
+                        </div>
+                        <span class="text-lg font-extrabold tracking-tight text-slate-900">Edu<span class="text-blue-600">Core</span></span>
+                    </a>
+
+                    <!-- Desktop Navigation Links -->
+                    <nav class="hidden md:flex items-center gap-1" aria-label="Main Navigation">
+                        <a href="#" class="px-3.5 py-2 rounded-xl text-sm font-semibold bg-slate-900 text-white">
+                            Dashboard
+                        </a>
+                        <a href="#courses-section" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                            Courses
+                        </a>
+                        <a href="#grades-section" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                            My Grades
+                        </a>
+                        <a href="#schedule-section" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                            Schedule
+                        </a>
+                        <a href="#" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                            Resources
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Right: Notifications & Profile Picture Area -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Term Pill Badge -->
+                    <span class="hidden sm:inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        Fall Term 2026
+                    </span>
+
+                    <!-- Notification Bell Button -->
+                    <button type="button" aria-label="Notifications" class="relative p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <!-- Solid Flat Unread Dot -->
+                        <span class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white"></span>
+                    </button>
+
+                    <!-- Divider -->
+                    <div class="h-7 w-0.5 bg-slate-200 hidden sm:block"></div>
+
+                    <!-- Profile Picture & Student Info -->
+                    <div class="flex items-center gap-3 pl-1 cursor-pointer group">
+                        <div class="hidden sm:flex flex-col text-right">
+                            <span class="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">Alex Rivera</span>
+                            <span class="text-xs font-medium text-slate-500">ID #20498 • CS Year 2</span>
+                        </div>
+                        <!-- Circular Profile Picture Placeholder -->
+                        <div class="relative">
+                            <img 
+                                src="https://placehold.co/96x96/0f172a/ffffff?text=AR" 
+                                onerror="this.onerror=null;this.src='https://placehold.co/96x96/3b82f6/ffffff?text=User';"
+                                alt="Student Profile Picture" 
+                                class="w-10 h-10 rounded-full object-cover border-2 border-slate-900 bg-slate-900"
+                            >
+                            <!-- Online Status Indicator -->
+                            <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Horizontal Scroll Nav -->
+            <nav class="flex md:hidden items-center gap-2 pb-3 overflow-x-auto" aria-label="Mobile Navigation">
+                <a href="#" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white whitespace-nowrap">Dashboard</a>
+                <a href="#courses-section" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Courses</a>
+                <a href="#grades-section" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">My Grades</a>
+                <a href="#schedule-section" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Schedule</a>
+                <a href="#" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">Resources</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <!-- Page Header Banner (Flat Solid Card) -->
+        <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Student Competence Overview</h1>
+                <p class="text-sm text-slate-600 mt-1">Explore your 5 core digital skill domains, active coursework, and academic standing.</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    Overall Mastery: 84%
+                </span>
+            </div>
+        </section>
+
+        <!-- PRIMARY SECTION: DEDICATED SKILL PENTAGON PANEL + DOMAIN BREAKDOWN -->
+        <section class="flat-panel p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 mb-6 border-b border-slate-200">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="px-2.5 py-1 rounded-md text-xs font-extrabold uppercase tracking-wider bg-slate-900 text-white">
+                            Core Matrix
+                        </span>
+                        <h2 class="text-xl font-bold text-slate-900">Digital Competence Pentagon</h2>
+                    </div>
+                    <p class="text-sm text-slate-500 mt-1">Hover or select any sector to inspect competence area benchmarks.</p>
+                </div>
+                <div class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 self-start sm:self-auto">
+                    Interactive Prototype View
+                </div>
+            </div>
+
+            <!-- Grid: Pentagon on Left/Center, Sector Details & Legend on Right -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Dedicated Pentagon Canvas Container -->
+                <div class="lg:col-span-7 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6">
+                    <div class="skill-pentagon-container">
+                        <svg class="pentagon-svg"
+                            viewBox="0 0 500 500"
+                            role="img"
+                            aria-label="5 Competence Areas">
+
+                            <!-- Center -->
+                            <polygon
+                                points="250,193 298,228 279,284 221,284 202,228"
+                                fill="#0f172a"
+                                stroke="#64748b"
+                                stroke-width="1.5"
+                            />
+
+                            <text x="250" y="246" text-anchor="middle"
+                                fill="#e2e8f0" font-size="11"
+                                font-weight="700" letter-spacing="1.2">
+                                DIGITAL
+                            </text>
+
+                            <text x="250" y="261" text-anchor="middle"
+                                fill="#94a3b8" font-size="9.5"
+                                font-weight="600" letter-spacing="0.8">
+                                CORE
+                            </text>
+
+                            <!-- Sector 1 -->
+                            <g id="sector-1"
+                            class="skill-sector"
+                            onmouseenter="previewSector(1)"
+                            onclick="openModal(1)">
+
+                                <polygon class="sector-polygon"
+                                    points="250,193 250,60 410,176 346,206 298,228"/>
+
+                                <g class="sector-label" transform="translate(308, 152)">
+                                    <text x="0" y="-6" text-anchor="middle"
+                                        fill="#fff" font-size="11.5" font-weight="800">
+                                        01 • INFO
+                                    </text>
+                                    <text x="0" y="9" text-anchor="middle"
+                                        fill="#dbeafe" font-size="9.5" font-weight="600">
+                                        Search &amp; Data
+                                    </text>
+                                </g>
+                            </g>
+
+                            <!-- Sector 2 -->
+                            <g id="sector-2"
+                            class="skill-sector"
+                            onmouseenter="previewSector(2)"
+                            onclick="openModal(2)">
+
+                                <polygon class="sector-polygon"
+                                    points="298,228 346,206 410,176 348,364 309,318 279,284"/>
+
+                                <g class="sector-label" transform="translate(342, 266)">
+                                    <text x="0" y="-6" text-anchor="middle"
+                                        fill="#fff" font-size="11.5" font-weight="800">
+                                        02 • COMM
+                                    </text>
+                                    <text x="0" y="9" text-anchor="middle"
+                                        fill="#fef3c7" font-size="9.5" font-weight="600">
+                                        Collaborate
+                                    </text>
+                                </g>
+                            </g>
+
+                            <!-- Sector 3 -->
+                            <g id="sector-3"
+                            class="skill-sector"
+                            onmouseenter="previewSector(3)"
+                            onclick="openModal(3)">
+
+                                <polygon class="sector-polygon"
+                                    points="279,284 309,318 348,364 152,364 191,318 221,284"/>
+
+                                <g class="sector-label" transform="translate(250, 330)">
+                                    <text x="0" y="-6" text-anchor="middle"
+                                        fill="#fff" font-size="11.5" font-weight="800">
+                                        03 • CREATE
+                                    </text>
+                                    <text x="0" y="9" text-anchor="middle"
+                                        fill="#d1fae5" font-size="9.5" font-weight="600">
+                                        Digital Content
+                                    </text>
+                                </g>
+                            </g>
+
+                            <!-- Sector 4 -->
+                            <g id="sector-4"
+                            class="skill-sector"
+                            onmouseenter="previewSector(4)"
+                            onclick="openModal(4)">
+
+                                <polygon class="sector-polygon"
+                                    points="221,284 191,318 152,364 90,176 154,206 202,228"/>
+
+                                <g class="sector-label" transform="translate(158, 266)">
+                                    <text x="0" y="-6" text-anchor="middle"
+                                        fill="#fff" font-size="11.5" font-weight="800">
+                                        04 • SAFETY
+                                    </text>
+                                    <text x="0" y="9" text-anchor="middle"
+                                        fill="#fef9c3" font-size="9.5" font-weight="600">
+                                        &amp; Wellbeing
+                                    </text>
+                                </g>
+                            </g>
+
+                            <!-- Sector 5 -->
+                            <g id="sector-5"
+                            class="skill-sector"
+                            onmouseenter="previewSector(5)"
+                            onclick="openModal(5)">
+
+                                <polygon class="sector-polygon"
+                                    points="202,228 154,206 90,176 250,60 250,193"/>
+
+                                <g class="sector-label" transform="translate(192, 152)">
+                                    <text x="0" y="-6" text-anchor="middle"
+                                        fill="#fff" font-size="11.5" font-weight="800">
+                                        05 • SOLVE
+                                    </text>
+                                    <text x="0" y="9" text-anchor="middle"
+                                        fill="#ffe4e6" font-size="9.5" font-weight="600">
+                                        Problem Solving
+                                    </text>
+                                </g>
+                            </g>
+
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Right Side: Static/Interactive Competence Inspector & Legend -->
+                <div class="lg:col-span-5 space-y-4">
+                    <!-- Active Sector Inspector Box -->
+                    <div id="sector-preview-card" class="p-5 rounded-2xl bg-slate-900 text-white border-2 border-slate-800">
+                        <div class="flex items-center justify-between mb-2">
+                            <span id="preview-badge" class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-500 text-white">
+                                01 • INFO
+                            </span>
+                            <span id="preview-score" class="text-xs font-bold text-slate-300">
+                                Level 4 • 92 / 100 pts
+                            </span>
+                        </div>
+                        <h3 id="preview-title" class="text-lg font-bold text-white mt-2">
+                            Information &amp; Data Literacy
+                        </h3>
+                        <p id="preview-desc" class="text-sm text-slate-300 mt-1.5 leading-relaxed">
+                            Browsing, searching, filtering, and evaluating digital data, information, and structured content sources.
+                        </p>
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+                            <span class="text-slate-400">Linked Course: <strong id="preview-course" class="text-white">DATA-101</strong></span>
+                            <span class="px-2.5 py-1 rounded-md bg-slate-800 text-slate-200 font-semibold">Click sector to pin</span>
+                        </div>
+                    </div>
+
+                    <!-- 5 Competence Domains Quick List -->
+                    <div class="space-y-2">
+                        <div class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">All 5 Competence Domains</div>
+                        
+                        <button type="button" onclick="openModal(1)" onmouseenter="previewSector(1)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition-colors text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-3.5 rounded-sm bg-blue-500 shrink-0"></span>
+                                <span class="text-sm font-bold text-slate-800">01 • Info &amp; Data Search</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-md">92%</span>
+                        </button>
+
+                        <button type="button" onclick="openModal(2)" onmouseenter="previewSector(2)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 transition-colors text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-3.5 rounded-sm bg-amber-500 shrink-0"></span>
+                                <span class="text-sm font-bold text-slate-800">02 • Communication &amp; Collab</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md">86%</span>
+                        </button>
+
+                        <button type="button" onclick="openModal(3)" onmouseenter="previewSector(3)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 transition-colors text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-3.5 rounded-sm bg-emerald-500 shrink-0"></span>
+                                <span class="text-sm font-bold text-slate-800">03 • Digital Content Creation</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">88%</span>
+                        </button>
+
+                        <button type="button" onclick="openModal(4)" onmouseenter="previewSector(4)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-yellow-50 border border-slate-200 transition-colors text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-3.5 rounded-sm bg-yellow-500 shrink-0"></span>
+                                <span class="text-sm font-bold text-slate-800">04 • Safety &amp; Wellbeing</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-yellow-800 bg-yellow-100 px-2.5 py-1 rounded-md">79%</span>
+                        </button>
+
+                        <button type="button" onclick="openModal(5)" onmouseenter="previewSector(5)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 transition-colors text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-3.5 rounded-sm bg-rose-500 shrink-0"></span>
+                                <span class="text-sm font-bold text-slate-800">05 • Technical Problem Solving</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-rose-700 bg-rose-100 px-2.5 py-1 rounded-md">75%</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECONDARY SECTION: BENTO GRID FOR COURSES, GRADES & SCHEDULE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- PANEL 2: ENROLLED COURSES (7 Columns) -->
+            <section id="courses-section" class="lg:col-span-7 flat-panel p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Enrolled Courses</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Active modules mapped to your competence matrix</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
+                            4 Active
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Course Card 1 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2.5">
+                                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-100 text-blue-700">DATA-101</span>
+                                    <span class="text-xs font-semibold text-slate-500">4 Credits</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-900">Data Literacy &amp; Analytics</h3>
+                                <p class="text-xs text-slate-500 mt-1">Prof. Elena Vance • Mon/Wed</p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex justify-between text-xs font-bold mb-1.5">
+                                    <span class="text-slate-600">Completion</span>
+                                    <span class="text-blue-600">92%</span>
+                                </div>
+                                <!-- Solid Flat Progress Bar -->
+                                <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course Card 2 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2.5">
+                                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-700">WEB-204</span>
+                                    <span class="text-xs font-semibold text-slate-500">4 Credits</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-900">Interactive Media Creation</h3>
+                                <p class="text-xs text-slate-500 mt-1">Dr. Marcus Chen • Tue/Thu</p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex justify-between text-xs font-bold mb-1.5">
+                                    <span class="text-slate-600">Completion</span>
+                                    <span class="text-emerald-600">88%</span>
+                                </div>
+                                <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-500 rounded-full" style="width: 88%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course Card 3 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2.5">
+                                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-100 text-amber-800">COMM-112</span>
+                                    <span class="text-xs font-semibold text-slate-500">3 Credits</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-900">Digital Team Collaboration</h3>
+                                <p class="text-xs text-slate-500 mt-1">Prof. Sarah Jenkins • Fri</p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex justify-between text-xs font-bold mb-1.5">
+                                    <span class="text-slate-600">Completion</span>
+                                    <span class="text-amber-600">86%</span>
+                                </div>
+                                <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-amber-500 rounded-full" style="width: 86%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course Card 4 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-2.5">
+                                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-rose-100 text-rose-700">ALGO-301</span>
+                                    <span class="text-xs font-semibold text-slate-500">4 Credits</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-900">Applied Problem Solving</h3>
+                                <p class="text-xs text-slate-500 mt-1">Dr. Aris Thorne • Tue/Thu</p>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex justify-between text-xs font-bold mb-1.5">
+                                    <span class="text-slate-600">Completion</span>
+                                    <span class="text-rose-600">75%</span>
+                                </div>
+                                <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-rose-500 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PANEL 3: MY GRADES SUMMARY (5 Columns) -->
+            <section id="grades-section" class="lg:col-span-5 flat-panel p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">My Grades</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Cumulative GPA &amp; recent evaluations</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-extrabold">
+                            Dean's List
+                        </span>
+                    </div>
+
+                    <!-- 3 Flat Stat Boxes -->
+                    <div class="grid grid-cols-3 gap-3 mb-5">
+                        <div class="p-3 rounded-xl bg-slate-900 text-white text-center">
+                            <div class="text-xs font-medium text-slate-400">Term GPA</div>
+                            <div class="text-xl font-extrabold mt-0.5">3.88</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-100 border border-slate-200 text-center">
+                            <div class="text-xs font-medium text-slate-500">Credits</div>
+                            <div class="text-xl font-extrabold text-slate-900 mt-0.5">48 / 120</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-100 border border-slate-200 text-center">
+                            <div class="text-xs font-medium text-slate-500">Standing</div>
+                            <div class="text-xl font-extrabold text-blue-600 mt-0.5">Top 8%</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Graded Assessments List -->
+                    <div class="space-y-2.5">
+                        <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Assessments</div>
+                        
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <div>
+                                <div class="text-sm font-bold text-slate-900">SQL Query Optimization Lab</div>
+                                <div class="text-xs text-slate-500">DATA-101 • Nov 18</div>
+                            </div>
+                            <span class="px-3 py-1 rounded-lg text-xs font-extrabold bg-blue-500 text-white">A (96%)</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <div>
+                                <div class="text-sm font-bold text-slate-900">SVG Vector UI Architecture</div>
+                                <div class="text-xs text-slate-500">WEB-204 • Nov 14</div>
+                            </div>
+                            <span class="px-3 py-1 rounded-lg text-xs font-extrabold bg-emerald-500 text-white">A (94%)</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <div>
+                                <div class="text-sm font-bold text-slate-900">Graph Traversal Midterm</div>
+                                <div class="text-xs text-slate-500">ALGO-301 • Nov 10</div>
+                            </div>
+                            <span class="px-3 py-1 rounded-lg text-xs font-extrabold bg-amber-500 text-white">B+ (88%)</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TERTIARY SECTION: UPCOMING DEADLINES & SCHEDULE BAR -->
+        <section id="schedule-section" class="flat-panel p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-200">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Upcoming Schedule &amp; Deadlines</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Next 7 days of deliverables and live sessions</p>
+                </div>
+                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 self-start sm:self-auto">
+                    Week 12 • Nov 24 – Nov 30
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Deadline 1 -->
+                <div class="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="w-12 h-12 rounded-xl bg-rose-500 text-white flex flex-col items-center justify-center shrink-0">
+                        <span class="text-[10px] font-bold uppercase">Nov</span>
+                        <span class="text-base font-extrabold leading-none">26</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600">Assignment Due</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Dynamic Programming Set</h3>
+                        <p class="text-xs text-slate-500 mt-1">ALGO-301 • 11:59 PM</p>
+                    </div>
+                </div>
+
+                <!-- Deadline 2 -->
+                <div class="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500 text-slate-900 flex flex-col items-center justify-center shrink-0">
+                        <span class="text-[10px] font-bold uppercase">Nov</span>
+                        <span class="text-base font-extrabold leading-none">28</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-yellow-700">Security Audit Quiz</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Privacy &amp; Data Protection</h3>
+                        <p class="text-xs text-slate-500 mt-1">SAFE-105 • Room B-204</p>
+                    </div>
+                </div>
+
+                <!-- Deadline 3 -->
+                <div class="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500 text-white flex flex-col items-center justify-center shrink-0">
+                        <span class="text-[10px] font-bold uppercase">Nov</span>
+                        <span class="text-base font-extrabold leading-none">30</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600">Capstone Milestone</span>
+                        <h3 class="text-sm font-bold text-slate-900 mt-0.5">Dataset Cleaning Pipeline</h3>
+                        <p class="text-xs text-slate-500 mt-1">DATA-101 • Team Submission</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Prototype Interaction Script for Pentagon Sectors -->
+    <script>
+        // Static metadata for prototype preview box
+        const sectorDetails = {
+            1: {
+                badge: "01 • INFO",
+                badgeBg: "bg-blue-500 text-white",
+                score: "Level 4 • 92 / 100 pts",
+                title: "Information & Data Literacy",
+                desc: "Browsing, searching, filtering, and evaluating digital data, information, and structured content sources.",
+                course: "DATA-101"
+            },
+            2: {
+                badge: "02 • COMM",
+                badgeBg: "bg-amber-500 text-white",
+                score: "Level 4 • 86 / 100 pts",
+                title: "Communication & Collaboration",
+                desc: "Interacting, sharing, and collaborating seamlessly through digital technologies and netiquette standards.",
+                course: "COMM-112"
+            },
+            3: {
+                badge: "03 • CREATE",
+                badgeBg: "bg-emerald-500 text-white",
+                score: "Level 4 • 88 / 100 pts",
+                title: "Digital Content Creation",
+                desc: "Developing, integrating, and re-elaborating digital media, interfaces, and structured software artifacts.",
+                course: "WEB-204"
+            },
+            4: {
+                badge: "04 • SAFETY",
+                badgeBg: "bg-yellow-500 text-slate-900",
+                score: "Level 3 • 79 / 100 pts",
+                title: "Safety & Digital Wellbeing",
+                desc: "Protecting devices, personal data, privacy, and maintaining sustainable digital health practices.",
+                course: "SAFE-105"
+            },
+            5: {
+                badge: "05 • SOLVE",
+                badgeBg: "bg-rose-500 text-white",
+                score: "Level 3 • 75 / 100 pts",
+                title: "Technical Problem Solving",
+                desc: "Identifying needs, resolving technical challenges, and creatively innovating with computational tools.",
+                course: "ALGO-301"
+            }
+        };
+
+        let pinnedSector = null;
+
+        function updatePreviewCard(id) {
+            const data = sectorDetails[id];
+            if (!data) return;
+
+            const badgeEl = document.getElementById("preview-badge");
+            badgeEl.textContent = data.badge;
+            badgeEl.className = `px-2.5 py-1 rounded-lg text-xs font-extrabold ${data.badgeBg}`;
+
+            document.getElementById("preview-score").textContent = data.score;
+            document.getElementById("preview-title").textContent = data.title;
+            document.getElementById("preview-desc").textContent = data.desc;
+            document.getElementById("preview-course").textContent = data.course;
+        }
+
+        function previewSector(id) {
+            if (pinnedSector === null) {
+                updatePreviewCard(id);
+            }
+        }
+
+        function openModal(id) {
+            // Toggle active-sector class for visual prototype feedback
+            document.querySelectorAll('.skill-sector').forEach(el => {
+                el.classList.remove('active-sector');
+            });
+
+            if (pinnedSector === id) {
+                pinnedSector = null;
+            } else {
+                pinnedSector = id;
+                const target = document.getElementById(`sector-${id}`);
+                if (target) target.classList.add('active-sector');
+                updatePreviewCard(id);
+            }
+        }
+    </script>
+</body>
+</html>
