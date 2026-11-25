@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './Pentagon.css'
 
 const sectors = [
   { id: 1, code: 'INFO', title: 'Information & Data Literacy', short: 'Info & Data', score: 92, level: 4, course: 'DATA-101', color: '#3b82f6', light: '#dbeafe', polygon: '250,193 250,60 410,176 346,206 298,228', label: [308,152] },
@@ -15,7 +16,7 @@ export default function Pentagon() {
   return (
     <section className="panel competence-panel">
       <div className="panel-heading">
-        <div><span className="eyebrow">Core Matrix</span><h2>Digital Competence Pentagon</h2></div>
+        <div><span className="eyebrow">Bảng đánh giá</span><h2>DIGCOM 3.0</h2></div>
         <span className="prototype-tag">Interactive Prototype</span>
       </div>
       <div className="competence-grid">

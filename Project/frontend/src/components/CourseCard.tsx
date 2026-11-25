@@ -1,3 +1,5 @@
+import './CourseCard.css'
+
 interface CourseCardProps {
   code: string
   title: string
