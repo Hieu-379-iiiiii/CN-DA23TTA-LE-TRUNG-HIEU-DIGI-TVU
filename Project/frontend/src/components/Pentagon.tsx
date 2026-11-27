@@ -17,7 +17,6 @@ export default function Pentagon() {
     <section className="panel competence-panel">
       <div className="panel-heading">
         <div><span className="eyebrow">Bảng đánh giá</span><h2>DIGCOM 3.0</h2></div>
-        <span className="prototype-tag">Interactive Prototype</span>
       </div>
       <div className="competence-grid">
         <div className="pentagon-canvas">

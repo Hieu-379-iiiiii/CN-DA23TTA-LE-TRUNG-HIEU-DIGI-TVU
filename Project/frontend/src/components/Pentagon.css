@@ -29,9 +29,47 @@
     transition:.25s
 }
 
-.skill-sector:hover,.skill-sector.active-sector{
-    transform:translate(8px,-10px);
-    filter:drop-shadow(0 10px 18px rgba(15,23,42,.18))
+/* Base sector */
+.skill-sector {
+    cursor: pointer;
+    transform-origin: 250px 250px;
+    transition: transform .25s ease, filter .25s ease;
+}
+
+/* Sector 1 - Top right */
+.sector-1:hover,
+.sector-1.active-sector {
+    transform: translate(8px, -10px);
+}
+
+/* Sector 2 - Bottom right */
+.sector-2:hover,
+.sector-2.active-sector {
+    transform: translate(12px, 5px);
+}
+
+/* Sector 3 - Bottom */
+.sector-3:hover,
+.sector-3.active-sector {
+    transform: translate(0, 12px);
+}
+
+/* Sector 4 - Bottom left */
+.sector-4:hover,
+.sector-4.active-sector {
+    transform: translate(-12px, 5px);
+}
+
+/* Sector 5 - Top left */
+.sector-5:hover,
+.sector-5.active-sector {
+    transform: translate(-8px, -10px);
+}
+
+/* Shared hover effect */
+.skill-sector:hover,
+.skill-sector.active-sector {
+    filter: drop-shadow(0 10px 18px rgba(15, 23, 42, .18));
 }
 
 .sector-polygon{
