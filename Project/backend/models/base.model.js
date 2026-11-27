@@ -7,6 +7,9 @@ class BaseModel {
 
   async findAll(options = {}) {
     const { limit, offset, orderBy = 'id', order = 'ASC' } = options;
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(String(orderBy))) {
+      throw new Error('Invalid orderBy column');
+    }
     const safeOrder = String(order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
     const values = [];
     let sql = `SELECT * FROM ${this.tableName} ORDER BY ${orderBy} ${safeOrder}`;
