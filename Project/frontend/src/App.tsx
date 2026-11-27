@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage'
 import CoursePage from './pages/CoursePage'
 import SkillPage from './pages/SkillPage'
 import UserPage from './pages/UserPage'
+import DiscoverPage from './pages/DiscoverPage'
+import SearchPage from './pages/SearchPage'
 
 export default function App() {
 	return (
@@ -17,6 +19,8 @@ export default function App() {
 						<Route path="/course" element={<CoursePage />} />
 						<Route path="/skill" element={<SkillPage />} />
 						<Route path="/user" element={<UserPage />} />
+						<Route path="/discover" element={<DiscoverPage />} />
+						<Route path="/search" element={<SearchPage />} />
 						<Route path="*" element={<Navigate to="/" replace />} />
 					</Routes>
 				</main>
